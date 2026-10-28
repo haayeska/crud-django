@@ -1,0 +1,103 @@
+{% extends 'alunos/base.html' %}
+
+{% block conteudo %}
+<section class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h1 class="h4 mb-3">Cadastrar aluno</h1>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="row g-3">
+        {% include 'alunos/_campos.html' %}
+      </div>
+      <button type="submit" class="btn btn-success mt-3">Cadastrar</button>
+    </form>
+  </div>
+</section>
+
+<section class="card shadow-sm">
+  <div class="card-body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <h2 class="h5 mb-0">Alunos <span class="badge text-bg-secondary">{{ alunos|length }}</span></h2>
+
+      <form method="get" class="d-flex gap-2" role="search">
+        <input type="search" name="q" value="{{ busca }}" class="form-control" placeholder="Buscar por nome, matrícula ou curso" aria-label="Buscar alunos">
+        <button type="submit" class="btn btn-outline-primary">Buscar</button>
+        {% if busca %}<a href="{% url 'lista_alunos' %}" class="btn btn-outline-secondary">Limpar</a>{% endif %}
+      </form>
+    </div>
+
+    {% if alunos %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th scope="col">Nome</th>
+              <th scope="col">Matrícula</th>
+              <th scope="col">Curso</th>
+              <th scope="col">E-mail</th>
+              <th scope="col">Nascimento</th>
+              <th scope="col" class="text-end">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for aluno in alunos %}
+              <tr>
+                <td class="fw-medium">{{ aluno.nome }}</td>
+                <td>{{ aluno.matricula }}</td>
+                <td>{{ aluno.curso }}</td>
+                <td><a href="mailto:{{ aluno.email }}">{{ aluno.email }}</a></td>
+                <td>{{ aluno.data_nascimento|date:'d/m/Y' }}</td>
+                <td class="text-end text-nowrap">
+                  <a href="{% url 'editar_aluno' aluno.id %}" class="btn btn-sm btn-outline-primary">Editar</a>
+                  <button type="button" class="btn btn-sm btn-outline-danger"
+                          data-bs-toggle="modal" data-bs-target="#confirmar-exclusao"
+                          data-url="{% url 'excluir_aluno' aluno.id %}" data-nome="{{ aluno.nome }}">
+                    Excluir
+                  </button>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% elif busca %}
+      <p class="text-secondary mb-0">Nenhum aluno encontrado para "{{ busca }}".</p>
+    {% else %}
+      <p class="text-secondary mb-0">Nenhum aluno cadastrado ainda. Use o formulário acima para cadastrar o primeiro.</p>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Uma janela só, reaproveitada por todos os botões Excluir -->
+<div class="modal fade" id="confirmar-exclusao" tabindex="-1" aria-labelledby="confirmar-exclusao-titulo" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form method="post" class="modal-content">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h2 class="modal-title h5" id="confirmar-exclusao-titulo">Excluir aluno</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        Tem certeza que quer excluir <strong data-nome-aluno></strong>? Essa ação não pode ser desfeita.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-danger">Excluir</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Antes de abrir, coloca na janela o nome e o endereço do aluno do botão clicado
+  document.getElementById('confirmar-exclusao').addEventListener('show.bs.modal', (evento) => {
+    const botao = evento.relatedTarget
+    const janela = evento.currentTarget
+    janela.querySelector('form').action = botao.dataset.url
+    janela.querySelector('[data-nome-aluno]').textContent = botao.dataset.nome
+  })
+</script>
+{% endblock %}

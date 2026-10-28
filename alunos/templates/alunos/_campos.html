@@ -1,0 +1,9 @@
+{% for campo in form %}
+  <div class="{% if campo.name == 'nome' or campo.name == 'curso' %}col-md-6{% else %}col-md-4{% endif %}">
+    <label for="{{ campo.id_for_label }}" class="form-label">{{ campo.label|capfirst }}</label>
+    {{ campo }}
+    {% if campo.errors %}
+      <div class="invalid-feedback">{{ campo.errors|join:" " }}</div>
+    {% endif %}
+  </div>
+{% endfor %}

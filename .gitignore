@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Ambiente virtual
+venv/
+.venv/
+env/
+
+# Banco local (cada pessoa cria o seu com python manage.py migrate)
+db.sqlite3
+db.sqlite3-journal
+
+# Variáveis de ambiente
+.env
+!.env.example
+
+# Arquivos estáticos coletados
+staticfiles/
+
+# Editor e sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
